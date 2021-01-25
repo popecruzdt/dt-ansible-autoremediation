@@ -1,0 +1,39 @@
+# rollback change
+---
+-
+  hosts: localhost
+  name: "rollback change with Ansible"
+  tasks:
+    -
+      name: "rollback a change with Ansible task(s)"
+      uri:
+        url: "replace this module with the module of your choice to rollback the change"
+    -
+      name: "send Dynatrace custom configuration event with business context information"
+      uri:
+        url: https://{{ dynatrace_api_url }}/api/v1/events?Api-Token={{ dynatrace_token }}
+        method: POST
+        headers:
+          content-type: application/json
+        body:
+          eventType: CUSTOM_CONFIGURATION
+          attachRules:
+            tagRule:
+            - meTypes:
+              - SERVICE
+              - PROCESS_GROUP_INSTANCE
+              - HOST
+              tags:
+              - context: CONTEXTLESS
+                key: "{{ configuration_tag_key }}"
+                value: "{{ configuration_tag_value }}"
+          source: Ansible Tower
+          description: "{{ configuration_details }}"
+          configuration: "{{ configuration_type }}"
+          customProperties:
+            Change Ticket: "{{ configuration_change_ticket }}"
+            Change New: "{{ configuration_new }}"
+            Change Old: "{{ configuration_old }}"
+            Remediation: "{{ configuration_remediation }}"
+        body_format: json
+        status_code: 200
